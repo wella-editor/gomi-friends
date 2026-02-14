@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WE ARE GOMI FRIENDS</title>
+<style>
+  /* 기본 설정 */
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Arial', sans-serif; }
+  body { overflow: hidden; background-color: #fcd4b4; } /* 기본 배경색 (1페이지) */
+
+  /* 페이지 공통 설정 */
+  .page {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 0; left: 0;
+    transition: opacity 0.5s ease;
+  }
+  .hidden { opacity: 0; pointer-events: none; z-index: -1; }
+  .active { opacity: 1; pointer-events: auto; z-index: 10; }
+
+  /* --- 1페이지: 랜딩 --- */
+  #page-landing { background-color: #fbd6b6; }
+  .main-title {
+    font-size: 4rem;
+    font-weight: 900;
+    color: white;
+    -webkit-text-stroke: 2px black;
+    letter-spacing: 2px;
+    margin-bottom: 30px;
+    text-shadow: 2px 2px 0 #000;
+  }
+  .btn-learn {
+    background-color: white;
+    color: #4a90e2;
+    padding: 15px 40px;
+    border-radius: 30px;
+    font-weight: bold;
+    font-size: 1.2rem;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease;
+    margin-bottom: 40px;
+  }
+  .btn-learn:hover { transform: scale(1.05); }
+  .group-img { max-width: 500px; width: 80%; }
+
+  /* --- 2페이지: 캐릭터 소개 (아코디언) --- */
+  #page-characters { background-color: #fff; display: flex; flex-direction: column; justify-content: space-between; }
+  .accordion-container {
+    display: flex;
+    width: 100%;
+    height: calc(100vh - 80px); /* 하단 버튼 영역 제외 */
+  }
+  .pane {
+    flex: 1; /* 기본 축소 상태 */
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 50px;
+    cursor: pointer;
+    overflow: hidden;
+    transition: flex 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+    position: relative;
+  }
+  .pane:hover { flex: 3; } /* 호버 시 확대 상태 */
+  
+  /* 각 섹션 배경색 */
+  .pane-uni { background-color: #c4def6; }
+  .pane-gomi { background-color: #fba868; }
+  .pane-pipi { background-color: #eef396; }
+
+  /* 섹션 내부 요소 */
+  .char-title {
+    font-size: 3.5rem;
+    font-weight: 900;
+    color: white;
+    -webkit-text-stroke: 2px black;
+    text-shadow: 2px 2px 0 #000;
+    margin-bottom: 20px;
+  }
+  .char-desc {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+    max-width: 70%;
+    line-height: 1.5;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.4s ease;
+    transition-delay: 0.2s; /* 창이 넓어진 후 텍스트 등장 */
+  }
+  .pane:hover .char-desc { opacity: 1; transform: translateY(0); }
+  
+  .char-img-placeholder {
+    font-size: 8rem; /* 실제 이미지 적용 전 임시 이모지 폰트 사이즈 */
+    margin-top: auto;
+    margin-bottom: 50px;
+    transition: transform 0.4s ease;
+  }
+  .pane:hover .char-img-placeholder { transform: scale(1.2); }
+
+  /* 하단 아티스트 버튼 영역 */
+  .bottom-bar {
+    height: 80px;
+    background-color: #fff;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 -5px 15px rgba(0,0,0,0.05);
+  }
+  .btn-artist {
+    background: transparent;
+    border: 2px solid #333;
+    padding: 10px 30px;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  .btn-artist:hover { background: #333; color: #fff; }
+
+  /* --- 3페이지: 포트폴리오 --- */
+  #page-portfolio { background-color: #f8f9fa; }
+  .portfolio-card {
+    background: white;
+    padding: 50px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    text-align: center;
+    max-width: 500px;
+    width: 90%;
+  }
+  .pf-title { font-size: 2rem; font-weight: 900; margin-bottom: 30px; color: #222; }
+  .pf-list { list-style: none; text-align: left; margin-bottom: 40px; }
+  .pf-list li {
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+    padding-left: 20px;
+    position: relative;
+    color: #444;
+  }
+  .pf-list li::before {
+    content: "•";
+    position: absolute;
+    left: 0; color: #4a90e2; font-weight: bold;
+  }
+  .insta-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: #E1306C;
+    font-weight: bold;
+    font-size: 1.2rem;
+    transition: transform 0.2s ease;
+  }
+  .insta-link:hover { transform: scale(1.1); }
+</style>
+</head>
+<body>
+
+  <div id="page-landing" class="page active">
+    <h1 class="main-title">WE ARE GOMI FRIENDS</h1>
+    <button class="btn-learn" onclick="switchPage('page-characters')">LEARN ABOUT US &gt;</button>
+    
+    <div style="font-size: 6rem;">🦄 🐻 🐣🦖</div>
+  </div>
+
+  <div id="page-characters" class="page hidden">
+    <div class="accordion-container">
+      
+      <div class="pane pane-uni">
+        <h2 class="char-title">UNI</h2>
+        <p class="char-desc">A highly imaginative unicorn. Loves to chatter endlessly.</p>
+        <div class="char-img-placeholder">🦄</div>
+      </div>
+
+      <div class="pane pane-gomi">
+        <h2 class="char-title">GOMI</h2>
+        <p class="char-desc">An adventurous bear. Always exploring new things.</p>
+        <div class="char-img-placeholder">🐻✈️</div>
+      </div>
+
+      <div class="pane pane-pipi">
+        <h2 class="char-title">PIPI & DINO</h2>
+        <p class="char-desc">A chick and a dinosaur who love to play. They have great synergy together.</p>
+        <div class="char-img-placeholder">🐣🏓🦖</div>
+      </div>
+
+    </div>
+    
+    <div class="bottom-bar">
+      <button class="btn-artist" onclick="switchPage('page-portfolio')">ABOUT ARTIST &gt;</button>
+    </div>
+  </div>
+
+  <div id="page-portfolio" class="page hidden">
+    <div class="portfolio-card">
+      <h2 class="pf-title">LOGICS4ME 🇰🇷</h2>
+      <ul class="pf-list">
+        <li>2020-2022 NC Character Designer</li>
+        <li>2023-2025 GIF Creator</li>
+        <li>2025- General Manager of GOMI FRIENDS</li>
+      </ul>
+      
+      <a href="https://instagram.com/@logics_design" target="_blank" class="insta-link">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.209-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+        </svg>
+        @logics_design
+      </a>
+    </div>
+  </div>
+
+  <script>
+    // 페이지 전환 로직
+    function switchPage(targetPageId) {
+      // 모든 페이지 숨김 처리
+      document.querySelectorAll('.page').forEach(page => {
+        page.classList.remove('active');
+        page.classList.add('hidden');
+      });
+      // 타겟 페이지만 표시
+      document.getElementById(targetPageId).classList.remove('hidden');
+      document.getElementById(targetPageId).classList.add('active');
+    }
+  </script>
+</body>
+</html>
